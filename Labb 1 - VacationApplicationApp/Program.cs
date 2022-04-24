@@ -454,7 +454,11 @@ namespace Labb_1___VacationApplicationApp
                     break;
 
             }
-            if(monthlyVacApplications.Count != 0) DisplayVacApplicationsWithList(monthlyVacApplications);
+            if (monthlyVacApplications.Count != 0)
+            {
+                DisplayVacApplicationsWithList(monthlyVacApplications);
+                TotalDaysSearchByEmployeeMonth(monthlyVacApplications);
+            }
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -463,6 +467,48 @@ namespace Labb_1___VacationApplicationApp
             }
             Console.ReadLine();      
         }
+        static void TotalDaysSearchByEmployeeMonth(List<VacApplication> monthlyVacApplications)
+        {
+            double totalDaysVacApplied = 0;
+            List<int> montlyEmployeeId = new List<int>();
+            var monthlyEmployees = from vacapp in monthlyVacApplications
+                            select vacapp.EmployeeId;
+
+            foreach(var employeeid in monthlyEmployees)
+            {
+                if (!montlyEmployeeId.Contains(employeeid))
+                {
+                    montlyEmployeeId.Add(employeeid);
+                }
+            }
+
+            foreach (var employeeid in montlyEmployeeId)
+            {
+                foreach(var vacapp in monthlyVacApplications)
+                {
+                    if(vacapp.EmployeeId == employeeid)
+                    {
+                        totalDaysVacApplied = totalDaysVacApplied + (vacapp.VacEndDate - vacapp.VacStartDate).TotalDays;
+                    }
+                }
+                string firstname = null;
+                string lastname = null; 
+
+                var employeesmonth = employeesList.Where(e => e.EmployeeId == employeeid).ToList();
+                foreach (var employee in employeesmonth)
+                {
+                    firstname = employee.EmployeeFirstName;
+                    lastname = employee.EmployeeLastName;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\n\t" + firstname + " " + lastname);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n\tTotal VacationApplication Days this month: " + totalDaysVacApplied);
+                Console.ResetColor();
+                totalDaysVacApplied = 0;
+            }                 
+        }// Displays the total of applied vacations from each employee
         static void DisplayVacApplications(Employee employee)
         {
             var searchQuery = from application in vacApplicationsList
